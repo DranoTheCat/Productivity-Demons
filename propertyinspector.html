@@ -1,0 +1,175 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<title>com.dranothecat.productivitydemon PI</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="css/sdpi.css">
+</head>
+
+<body>
+	<div class="sdpi-wrapper hidden">
+		<div class="sdpi-item">
+			<div class="sdpi-item-label">Daily Point Goal</div>
+			<input inputmode="numeric" pattern="[0-9]*" type="number" class="sdpi-item-value" id="dailyPointGoal" onchange="sendValueToPlugin(event.target.value, 'dailyPointGoal')" placeholder="50">
+		</div>
+		<div class="sdpi-item">
+			<div class="sdpi-item-label">Roll 1 Outcome</div>
+			<input inputmode="numeric" pattern="[0-9a-z]*" type="number" class="sdpi-item-value" id="outcome2" onchange="sendValueToPlugin(event.target.value, 'outcome1')" placeholder="Nothing!">
+		</div>
+		<div class="sdpi-item">
+			<div class="sdpi-item-label">Roll 2 Outcome</div>
+			<input inputmode="numeric" pattern="[0-9a-z]*" type="number" class="sdpi-item-value" id="outcome2" onchange="sendValueToPlugin(event.target.value, 'outcome2')" placeholder="Nothing!">
+		</div>
+		<div class="sdpi-item">
+			<div class="sdpi-item-label">Roll 3 Outcome</div>
+			<input inputmode="numeric" pattern="[0-9a-z]*" type="number" class="sdpi-item-value" id="outcome3" onchange="sendValueToPlugin(event.target.value, 'outcome3')" placeholder="Nothing!">
+		</div>
+		<div class="sdpi-item">
+			<div class="sdpi-item-label">Roll 4 Outcome</div>
+			<input inputmode="numeric" pattern="[0-9a-z]*" type="number" class="sdpi-item-value" id="outcome4" onchange="sendValueToPlugin(event.target.value, 'outcome4')" placeholder="Nothing!">
+		</div>
+		<div class="sdpi-item">
+			<div class="sdpi-item-label">Roll 5 Outcome</div>
+			<input inputmode="numeric" pattern="[0-9a-z]*" type="number" class="sdpi-item-value" id="outcome5" onchange="sendValueToPlugin(event.target.value, 'outcome5')" placeholder="Nothing!">
+		</div>
+		<div class="sdpi-item">
+			<div class="sdpi-item-label">Roll 6 Outcome</div>
+			<input inputmode="numeric" pattern="[0-9a-z]*" type="number" class="sdpi-item-value" id="outcome6" onchange="sendValueToPlugin(event.target.value, 'outcome6')" placeholder="Nothing!">
+		</div>
+		
+		<details>
+			<summary>License</summary>
+			<p>All art is ©DranoTheCat</p>
+		</details>
+	</div>
+
+	<script src="../js/common.js"></script>
+	<script>
+
+		/** Step 1: Subscribe to the 'connected' event
+		 * and call your own initialization method.
+		 * The connected - event is emitted, when StreamDeck 
+		 * has established a connection. 
+		 * The 'connected' event carries a JSON object containing
+		 * necessary information about the connection and the
+		 * inital data.
+		 */
+		var uuid,
+			actionInfo,
+			context,
+			lang;
+			
+		var elements = {
+			dailyPointGoal: null,
+			currentPoints: null,
+			outcome1: null,
+			outcome2: null,
+			outcome3: null,
+			outcome4: null,
+			outcome5: null,
+			outcome6: null,
+		}
+
+		$SD.on('connected', (jsonObj) => connected(jsonObj));
+		$SD.on('sendToPropertyInspector', (jsonObj) => receivedDataFromPlugin(jsonObj));
+
+		function receivedDataFromPlugin(jsonObj) {
+			console.log('receivedDataFromPlugin: ', jsonObj);
+			if(jsonObj.event === "didReceiveSettings"){
+				if (jsonObj.payload.settings.hasOwnProperty('dailyPointGoal')) {
+					console.log("Got daily point goal value: "+jsonObj.payload.settings.dailyPointGoal);
+					elements.dailyPointGoal.value = jsonObj.payload.settings.dailyPointGoal;
+				}
+				if (jsonObj.payload.settings.hasOwnProperty('outcome1')) {
+					console.log("Got outcome1 value: "+jsonObj.payload.settings.outcome1);
+					elements.outcome1.value = jsonObj.payload.settings.outcome1;
+				}		
+				if (jsonObj.payload.settings.hasOwnProperty('outcome2')) {
+					console.log("Got outcome2 value: "+jsonObj.payload.settings.outcome2);
+					elements.outcome2.value = jsonObj.payload.settings.outcome2;
+				}		
+				if (jsonObj.payload.settings.hasOwnProperty('outcome3')) {
+					console.log("Got outcome3 value: "+jsonObj.payload.settings.outcome3);
+					elements.outcome1.value = jsonObj.payload.settings.outcome3;
+				}		
+				if (jsonObj.payload.settings.hasOwnProperty('outcome4')) {
+					console.log("Got outcome4 value: "+jsonObj.payload.settings.outcome4);
+					elements.outcome1.value = jsonObj.payload.settings.outcome1;
+				}		
+				if (jsonObj.payload.settings.hasOwnProperty('outcome5')) {
+					console.log("Got outcome5 value: "+jsonObj.payload.settings.outcome5);
+					elements.outcome1.value = jsonObj.payload.settings.outcome1;
+				}		
+				if (jsonObj.payload.settings.hasOwnProperty('outcome6')) {
+					console.log("Got outcome6 value: "+jsonObj.payload.settings.outcome6);
+					elements.outcome1.value = jsonObj.payload.settings.outcome1;
+				}		
+			} else if (jsonObj && jsonObj.payload) {
+				if (jsonObj.payload.hasOwnProperty('dailyPointGoal')) {
+					console.log("Got dailyPointGoal value: "+jsonObj.payload.dailyPointGoal);
+					elements.dailyPointGoal.value = jsonObj.payload.dailyPointGoal;
+				}
+				if (jsonObj.payload.hasOwnProperty('outcome1')) {
+					console.log("Got outcome1 value: "+jsonObj.payload.outcome1);
+					elements.outcome1.value = jsonObj.payload.outcome1;
+				}
+				if (jsonObj.payload.hasOwnProperty('outcome2')) {
+					console.log("Got outcome2 value: "+jsonObj.payload.outcome2);
+					elements.outcome2.value = jsonObj.payload.outcome2;
+				}
+				if (jsonObj.payload.hasOwnProperty('outcome3')) {
+					console.log("Got outcome3 value: "+jsonObj.payload.outcome3);
+					elements.outcome3.value = jsonObj.payload.outcome3;
+				}
+				if (jsonObj.payload.hasOwnProperty('outcome4')) {
+					console.log("Got outcome4 value: "+jsonObj.payload.outcome4);
+					elements.outcome4.value = jsonObj.payload.outcome4;
+				}
+				if (jsonObj.payload.hasOwnProperty('outcome5')) {
+					console.log("Got outcome5 value: "+jsonObj.payload.outcome5);
+					elements.outcome5.value = jsonObj.payload.outcome5;
+				}
+				if (jsonObj.payload.hasOwnProperty('outcome6')) {
+					console.log("Got outcome6 value: "+jsonObj.payload.outcome6);
+					elements.outcome1.value = jsonObj.payload.outcome6;
+				}
+			}
+		}
+
+		function connected(jsonObj) {
+			uuid = jsonObj.uuid;
+			actionInfo = jsonObj.actionInfo.action;
+			context = jsonObj.actionInfo.context;
+			
+
+			elements.dailyPointGoal = document.querySelector("#dailyPointGoal");
+			elements.outcome1 = document.querySelector("#outcome1");
+			elements.outcome2 = document.querySelector("#outcome2");
+			elements.outcome3 = document.querySelector("#outcome3");
+			elements.outcome4 = document.querySelector("#outcome4");
+			elements.outcome5 = document.querySelector("#outcome5");
+			elements.outcome6 = document.querySelector("#outcome6");
+
+			// request some data from the plugin (e.g. the current values)
+			$SD.api.sendToPlugin(uuid, actionInfo, {DATAREQUEST: true});
+
+			document.querySelector('.sdpi-wrapper').classList.remove('hidden');
+		};
+
+		function sendValueToPlugin(value, param) {
+			console.log("SENDING VALUE TO PLUGIN: ", value, uuid, actionInfo);
+			if ($SD && $SD.connection) {
+				var payload = {};
+				if (param) {
+					payload[param] = value;
+				}
+				$SD.api.sendToPlugin(uuid, actionInfo, payload);
+			}
+		}
+
+	</script>
+
+</body>
+
+</html>
