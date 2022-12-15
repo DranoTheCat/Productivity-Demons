@@ -391,7 +391,7 @@ var demonAction = {
             });
         }
 
-        // do slot machine stuff here
+        // do slot machine stuff here    
         scoreTotal += 5;
 
         let now = Date.now();
