@@ -203,11 +203,9 @@ var demonAction = {
         // Do it here just in case we get in a weird state
         if (animationFrame >= Object.keys(animationTimings[""+animationSet]).length) {
             animationFrame = 1;
-            console.log("Reset animation loop");
             demonAction.updateRuntime(context, {animationFrame: animationFrame});
         }
 
-        console.log(now - animationTime);
         if (now - animationTime > animationTimings[""+animationSet][animationFrame]) {
             animationFrame += 1;
             animationTime = now;
@@ -230,36 +228,50 @@ var demonAction = {
         ctx.fillRect(0, 0, handleObj.canvas.width, handleObj.canvas.height);
         
         //let resImageURL = "images/pluginIcon@2x.png";
-        console.log(animationFrame);
         let resImageURL = animationFrames[""+animationSet][animationFrame];
 
         let img = new Image();
         img.onload = () => {
             var handleObj = this.getHandleObjFromCache(context);
+            
+            // Draw the base frame PNG
             ctx.drawImage(img, 0, 0);
-            let time_delta = now - lastInteractionTime;
-            let time_pct = time_delta / (handleObj.settings.interactionIntervalMinutes * 1000); // * 60 more
-            if (time_pct > 1) {
-                time_pct = 1;
-            }
 
+            /*
             ctx.fillStyle = "#FF00FF";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.font = "3em Georgia";
             ctx.fillText(animationFrame, 72, 15);
-
+            */
+            
+            // Draw the Progress Bar until Next Slot Event
+            nextEventBar = {
+                x: 6,
+                y: 6,
+                width: 2,
+                height: 120,
+            };
+            let time_delta = now - lastInteractionTime;
+            let time_pct = time_delta / (handleObj.settings.interactionIntervalMinutes * 1000); // * 60 more
+            if (time_pct > 1) {
+                time_pct = 1;
+            }
+            // Red Bar Total
             ctx.fillStyle = "#FF4444";
-            ctx.fillRect(12, 40, 120, 2);   
+            ctx.fillRect(nextEventBar.x, nextEventBar.y, nextEventBar.width, nextEventBar.height);   
+            // Green Bar Percent
             ctx.fillStyle = "#44FF44";
-            let pixels_to_fill = 120;
+            let pixels_to_fill = nextEventBar.height;
             if (time_pct <= 1) {
-                pixels_to_fill -= Math.floor(time_pct * 120);
+                pixels_to_fill -= Math.floor(time_pct * nextEventBar.height);
                 if (pixels_to_fill < 1) {
                     pixels_to_fill = 1;
                 }
             }
-            ctx.fillRect(12, 40, pixels_to_fill, 2);
+            ctx.fillRect(nextEventBar.x, nextEventBar.y + (nextEventBar.height - pixels_to_fill), nextEventBar.width, pixels_to_fill);
+
+            // Update
             $SD.api.setImage(context, handleObj.canvas.toDataURL());
         };
         img.src = resImageURL;
