@@ -10,41 +10,32 @@
 <body>
 	<div class="sdpi-wrapper hidden">
 		<div class="sdpi-item">
-			<div class="sdpi-item-label">Daily Point Goal</div>
-			<input inputmode="numeric" pattern="[0-9]*" type="number" class="sdpi-item-value" id="dailyPointGoal" onchange="sendValueToPlugin(event.target.value, 'dailyPointGoal')" placeholder="50">
+			<div class="sdpi-item-label">Daily Score Target</div>
+			<input inputmode="numeric" pattern="[0-9]*" type="number" class="sdpi-item-value" id="dailyScoreTarget" onchange="sendValueToPlugin(event.target.value, 'dailyScoreTarget')" placeholder="100">
 		</div>
 		<div class="sdpi-item">
-			<div class="sdpi-item-label">Roll 1 Outcome</div>
-			<input inputmode="numeric" pattern="[0-9a-z]*" type="number" class="sdpi-item-value" id="outcome2" onchange="sendValueToPlugin(event.target.value, 'outcome1')" placeholder="Nothing!">
+			<div class="sdpi-item-label">Interaction Interval (in minutes)</div>
+			<input inputmode="numeric" pattern="[0-9]*" type="number" class="sdpi-item-value" id="interactionIntervalMinutes" onchange="sendValueToPlugin(event.target.value, 'interactionIntervalMinutes')" placeholder="15">
 		</div>
 		<div class="sdpi-item">
-			<div class="sdpi-item-label">Roll 2 Outcome</div>
-			<input inputmode="numeric" pattern="[0-9a-z]*" type="number" class="sdpi-item-value" id="outcome2" onchange="sendValueToPlugin(event.target.value, 'outcome2')" placeholder="Nothing!">
+			<div class="sdpi-item-label">Easy Outcome</div>
+			<input inputmode="text" pattern="[0-9a-zA-Z ]*" type="text" class="sdpi-item-value" id="easyOutcome" onchange="sendValueToPlugin(event.target.value, 'easyOutcome')" placeholder="Relax!">
 		</div>
 		<div class="sdpi-item">
-			<div class="sdpi-item-label">Roll 3 Outcome</div>
-			<input inputmode="numeric" pattern="[0-9a-z]*" type="number" class="sdpi-item-value" id="outcome3" onchange="sendValueToPlugin(event.target.value, 'outcome3')" placeholder="Nothing!">
+			<div class="sdpi-item-label">Medium Outcome</div>
+			<input inputmode="text" pattern="[0-9a-zA-Z ]*" type="text" class="sdpi-item-value" id="mediumOutcome" onchange="sendValueToPlugin(event.target.value, 'mediumOutcome')" placeholder="Stretch!">
 		</div>
 		<div class="sdpi-item">
-			<div class="sdpi-item-label">Roll 4 Outcome</div>
-			<input inputmode="numeric" pattern="[0-9a-z]*" type="number" class="sdpi-item-value" id="outcome4" onchange="sendValueToPlugin(event.target.value, 'outcome4')" placeholder="Nothing!">
+			<div class="sdpi-item-label">Hard Outcome</div>
+			<input inputmode="text" pattern="[0-9a-zA-Z ]*" type="text" class="sdpi-item-value" id="hardOutcome" onchange="sendValueToPlugin(event.target.value, 'hardOutcome')" placeholder="Be Productive!">
 		</div>
-		<div class="sdpi-item">
-			<div class="sdpi-item-label">Roll 5 Outcome</div>
-			<input inputmode="numeric" pattern="[0-9a-z]*" type="number" class="sdpi-item-value" id="outcome5" onchange="sendValueToPlugin(event.target.value, 'outcome5')" placeholder="Nothing!">
-		</div>
-		<div class="sdpi-item">
-			<div class="sdpi-item-label">Roll 6 Outcome</div>
-			<input inputmode="numeric" pattern="[0-9a-z]*" type="number" class="sdpi-item-value" id="outcome6" onchange="sendValueToPlugin(event.target.value, 'outcome6')" placeholder="Nothing!">
-		</div>
-		
 		<details>
 			<summary>License</summary>
 			<p>All art is ©DranoTheCat</p>
 		</details>
 	</div>
 
-	<script src="../js/common.js"></script>
+	<script src="js/common.js"></script>
 	<script>
 
 		/** Step 1: Subscribe to the 'connected' event
@@ -61,14 +52,11 @@
 			lang;
 			
 		var elements = {
-			dailyPointGoal: null,
-			currentPoints: null,
-			outcome1: null,
-			outcome2: null,
-			outcome3: null,
-			outcome4: null,
-			outcome5: null,
-			outcome6: null,
+			dailyScoreTarget: null,
+			interactionIntervalMinutes: null,
+			easyOutcome: null,
+			mediumOutcome: null,
+			hardOutcome: null,
 		}
 
 		$SD.on('connected', (jsonObj) => connected(jsonObj));
@@ -77,63 +65,48 @@
 		function receivedDataFromPlugin(jsonObj) {
 			console.log('receivedDataFromPlugin: ', jsonObj);
 			if(jsonObj.event === "didReceiveSettings"){
-				if (jsonObj.payload.settings.hasOwnProperty('dailyPointGoal')) {
-					console.log("Got daily point goal value: "+jsonObj.payload.settings.dailyPointGoal);
-					elements.dailyPointGoal.value = jsonObj.payload.settings.dailyPointGoal;
+				if (jsonObj.payload.settings.hasOwnProperty('dailyScoreTarget')) {
+					console.log("Got daily point goal value: "+jsonObj.payload.settings.dailyScoreTarget);
+					elements.dailyScoreTarget.value = jsonObj.payload.settings.dailyScoreTarget;
 				}
-				if (jsonObj.payload.settings.hasOwnProperty('outcome1')) {
-					console.log("Got outcome1 value: "+jsonObj.payload.settings.outcome1);
-					elements.outcome1.value = jsonObj.payload.settings.outcome1;
-				}		
-				if (jsonObj.payload.settings.hasOwnProperty('outcome2')) {
-					console.log("Got outcome2 value: "+jsonObj.payload.settings.outcome2);
-					elements.outcome2.value = jsonObj.payload.settings.outcome2;
-				}		
-				if (jsonObj.payload.settings.hasOwnProperty('outcome3')) {
-					console.log("Got outcome3 value: "+jsonObj.payload.settings.outcome3);
-					elements.outcome1.value = jsonObj.payload.settings.outcome3;
-				}		
-				if (jsonObj.payload.settings.hasOwnProperty('outcome4')) {
-					console.log("Got outcome4 value: "+jsonObj.payload.settings.outcome4);
-					elements.outcome1.value = jsonObj.payload.settings.outcome1;
-				}		
-				if (jsonObj.payload.settings.hasOwnProperty('outcome5')) {
-					console.log("Got outcome5 value: "+jsonObj.payload.settings.outcome5);
-					elements.outcome1.value = jsonObj.payload.settings.outcome1;
-				}		
-				if (jsonObj.payload.settings.hasOwnProperty('outcome6')) {
-					console.log("Got outcome6 value: "+jsonObj.payload.settings.outcome6);
-					elements.outcome1.value = jsonObj.payload.settings.outcome1;
-				}		
+				if (jsonObj.payload.settings.hasOwnProperty('interactionIntervalMinutes')) {
+					console.log("Got daily point goal value: "+jsonObj.payload.settings.interactionIntervalMinutes);
+					elements.interactionIntervalMinutes.value = jsonObj.payload.settings.interactionIntervalMinutes;
+				}
+				if (jsonObj.payload.settings.hasOwnProperty('easyOutcome')) {
+					console.log("Got daily point goal value: "+jsonObj.payload.settings.easyOutcome);
+					elements.easyOutcome.value = jsonObj.payload.settings.easyOutcome;
+				}
+				if (jsonObj.payload.settings.hasOwnProperty('mediumOutcome')) {
+					console.log("Got daily point goal value: "+jsonObj.payload.settings.mediumOutcome);
+					elements.mediumOutcome.value = jsonObj.payload.settings.mediumOutcome;
+				}
+				if (jsonObj.payload.settings.hasOwnProperty('hardOutcome')) {
+					console.log("Got daily point goal value: "+jsonObj.payload.settings.hardOutcome);
+					elements.hardOutcome.value = jsonObj.payload.settings.hardOutcome;
+				}
 			} else if (jsonObj && jsonObj.payload) {
-				if (jsonObj.payload.hasOwnProperty('dailyPointGoal')) {
-					console.log("Got dailyPointGoal value: "+jsonObj.payload.dailyPointGoal);
-					elements.dailyPointGoal.value = jsonObj.payload.dailyPointGoal;
+				if (jsonObj.payload.hasOwnProperty('dailyScoreTarget')) {
+					console.log("Got dailyPointGoal value: "+jsonObj.payload.dailyScoreTarget);
+					elements.dailyScoreTarget.value = jsonObj.payload.dailyScoreTarget;
 				}
-				if (jsonObj.payload.hasOwnProperty('outcome1')) {
-					console.log("Got outcome1 value: "+jsonObj.payload.outcome1);
-					elements.outcome1.value = jsonObj.payload.outcome1;
+				if (jsonObj.payload.hasOwnProperty('interactionIntervalMinutes')) {
+					console.log("Got dailyPointGoal value: "+jsonObj.payload.interactionIntervalMinutes);
+					elements.interactionIntervalMinutes.value = jsonObj.payload.interactionIntervalMinutes;
 				}
-				if (jsonObj.payload.hasOwnProperty('outcome2')) {
-					console.log("Got outcome2 value: "+jsonObj.payload.outcome2);
-					elements.outcome2.value = jsonObj.payload.outcome2;
+				if (jsonObj.payload.hasOwnProperty('easyOutcome')) {
+					console.log("Got dailyPointGoal value: "+jsonObj.payload.easyOutcome);
+					elements.easyOutcome.value = jsonObj.payload.easyOutcome;
 				}
-				if (jsonObj.payload.hasOwnProperty('outcome3')) {
-					console.log("Got outcome3 value: "+jsonObj.payload.outcome3);
-					elements.outcome3.value = jsonObj.payload.outcome3;
+				if (jsonObj.payload.hasOwnProperty('mediumOutcome')) {
+					console.log("Got dailyPointGoal value: "+jsonObj.payload.mediumOutcome);
+					elements.mediumOutcome.value = jsonObj.payload.mediumOutcome;
 				}
-				if (jsonObj.payload.hasOwnProperty('outcome4')) {
-					console.log("Got outcome4 value: "+jsonObj.payload.outcome4);
-					elements.outcome4.value = jsonObj.payload.outcome4;
+				if (jsonObj.payload.hasOwnProperty('hardOutcome')) {
+					console.log("Got dailyPointGoal value: "+jsonObj.payload.hardOutcome);
+					elements.hardOutcome.value = jsonObj.payload.hardOutcome;
 				}
-				if (jsonObj.payload.hasOwnProperty('outcome5')) {
-					console.log("Got outcome5 value: "+jsonObj.payload.outcome5);
-					elements.outcome5.value = jsonObj.payload.outcome5;
-				}
-				if (jsonObj.payload.hasOwnProperty('outcome6')) {
-					console.log("Got outcome6 value: "+jsonObj.payload.outcome6);
-					elements.outcome1.value = jsonObj.payload.outcome6;
-				}
+				
 			}
 		}
 
@@ -143,13 +116,11 @@
 			context = jsonObj.actionInfo.context;
 			
 
-			elements.dailyPointGoal = document.querySelector("#dailyPointGoal");
-			elements.outcome1 = document.querySelector("#outcome1");
-			elements.outcome2 = document.querySelector("#outcome2");
-			elements.outcome3 = document.querySelector("#outcome3");
-			elements.outcome4 = document.querySelector("#outcome4");
-			elements.outcome5 = document.querySelector("#outcome5");
-			elements.outcome6 = document.querySelector("#outcome6");
+			elements.dailyScoreTarget = document.querySelector("#dailyScoreTarget");
+			elements.interactionIntervalMinutes = document.querySelector("#interactionIntervalMinutes");
+			elements.easyOutcome = document.querySelector("#easyOutcome");
+			elements.mediumOutcome = document.querySelector("#mediumOutcome");
+			elements.hardOutcome = document.querySelector("#hardOutcome");
 
 			// request some data from the plugin (e.g. the current values)
 			$SD.api.sendToPlugin(uuid, actionInfo, {DATAREQUEST: true});
