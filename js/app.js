@@ -658,8 +658,6 @@ var demonAction = {
         ctx.fillStyle = "#0A1423";
         ctx.fillRect(0, 0, handleObj.canvas.width, handleObj.canvas.height);
         
-            
-                
         // Draw the background frame if we have one
         if (animationSet == 'hellpossessed') {
             let bgImg = new Image();
