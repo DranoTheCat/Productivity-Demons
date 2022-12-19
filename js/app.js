@@ -340,7 +340,7 @@ var demonAction = {
             easyOutcome: "Relax!",
             mediumOutcome: "Stretch!",
             hardOutcome: "Be Productive!",
-            interactionIntervalMinutes: 33, // 15?
+            interactionIntervalMinutes: 15,
             dailyScoreTarget: 100,
             r_lastInteractionTime: 0,
             r_scoreTotal: 0,
@@ -531,7 +531,7 @@ var demonAction = {
                 handleObj.settings.hardOutcome = val;
             }
             if (jsonObj.payload.hasOwnProperty('interactionIntervalMinutes')) {
-                const val = parseInt(jsonObj.payload['interactionIntervalMinutes']) || 5;
+                const val = parseInt(jsonObj.payload['interactionIntervalMinutes']) || 15;
                 console.log("onSendToPlugin resetting interactionIntervalMinutes to " + val);
                 handleObj.settings.interactionIntervalMinutes = val;
             }
@@ -615,7 +615,7 @@ var demonAction = {
                 if (now - r_lastOtherAnim > 1000) { // Check to run other animations every second
                     // Also a good time to see if we need to change state
                     if (r_animationSet != 'blissful') {
-                        deltaInterval = parseInt((now - r_lastInteractionTime) / (handleObj.settings.interactionIntervalMinutes * 500)); // TODO: * 60 // 500 because /2
+                        deltaInterval = parseInt((now - r_lastInteractionTime) / (handleObj.settings.interactionIntervalMinutes * 500 * 60)); // 500 because /2
                         if (deltaInterval >= stateIntervals.length) {
                             deltaInterval = stateIntervals.length - 1;
                         }
@@ -636,7 +636,6 @@ var demonAction = {
                                 r_animationAction: r_animationAction,
                                 r_lastOtherAnim: now,
                             });
-                            //break;
                         }
                     }
                     demonAction.updateSafeSettings(context, {
@@ -711,7 +710,7 @@ var demonAction = {
                 height: 120,
             };
             let time_delta = now - r_lastInteractionTime;
-            let time_pct = time_delta / (handleObj.settings.interactionIntervalMinutes * 1000); // * TODO: *60 more
+            let time_pct = time_delta / (handleObj.settings.interactionIntervalMinutes * 1000 * 60);
             time_pct = time_pct - Math.floor(time_pct); // Keep resetting the bar
             if (time_pct > 1) {
                 time_pct = 1;

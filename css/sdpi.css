@@ -812,6 +812,11 @@ details > h4 {
   border-bottom: 1px solid var(--sdpi-bordercolor);
 }
 
+.center {
+  width: 50%;
+  margin: auto;
+}
+
 legend {
   display: none;
 }

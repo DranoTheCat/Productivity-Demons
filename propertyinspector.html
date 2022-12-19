@@ -29,10 +29,10 @@
 			<div class="sdpi-item-label">Hard Outcome</div>
 			<input inputmode="text" pattern="[0-9a-zA-Z ]*" type="text" class="sdpi-item-value" id="hardOutcome" onchange="sendValueToPlugin(event.target.value, 'hardOutcome')" placeholder="Be Productive!">
 		</div>
-		<details>
-			<summary>License</summary>
-			<p>All art is ©DranoTheCat 2022</p>
-		</details>
+		<hr/>
+		<div class="center">
+			<p>©DranoTheCat 2022</p>
+		</ddiv>
 	</div>
 
 	<script src="js/common.js"></script>
@@ -112,7 +112,7 @@
 			elements.mediumOutcome = document.querySelector("#mediumOutcome");
 			elements.hardOutcome = document.querySelector("#hardOutcome");
 
-			// request some data from the plugin (e.g. the current values)
+			// request current data from the plugin
 			$SD.api.sendToPlugin(uuid, actionInfo, {DATAREQUEST: true});
 
 			document.querySelector('.sdpi-wrapper').classList.remove('hidden');
