@@ -31,7 +31,7 @@
 		</div>
 		<details>
 			<summary>License</summary>
-			<p>All art is ©DranoTheCat</p>
+			<p>All art is ©DranoTheCat 2022</p>
 		</details>
 	</div>
 
@@ -66,44 +66,34 @@
 			console.log('receivedDataFromPlugin: ', jsonObj);
 			if(jsonObj.event === "didReceiveSettings"){
 				if (jsonObj.payload.settings.hasOwnProperty('dailyScoreTarget')) {
-					console.log("Got daily point goal value: "+jsonObj.payload.settings.dailyScoreTarget);
 					elements.dailyScoreTarget.value = jsonObj.payload.settings.dailyScoreTarget;
 				}
 				if (jsonObj.payload.settings.hasOwnProperty('interactionIntervalMinutes')) {
-					console.log("Got daily point goal value: "+jsonObj.payload.settings.interactionIntervalMinutes);
 					elements.interactionIntervalMinutes.value = jsonObj.payload.settings.interactionIntervalMinutes;
 				}
 				if (jsonObj.payload.settings.hasOwnProperty('easyOutcome')) {
-					console.log("Got daily point goal value: "+jsonObj.payload.settings.easyOutcome);
 					elements.easyOutcome.value = jsonObj.payload.settings.easyOutcome;
 				}
 				if (jsonObj.payload.settings.hasOwnProperty('mediumOutcome')) {
-					console.log("Got daily point goal value: "+jsonObj.payload.settings.mediumOutcome);
 					elements.mediumOutcome.value = jsonObj.payload.settings.mediumOutcome;
 				}
 				if (jsonObj.payload.settings.hasOwnProperty('hardOutcome')) {
-					console.log("Got daily point goal value: "+jsonObj.payload.settings.hardOutcome);
 					elements.hardOutcome.value = jsonObj.payload.settings.hardOutcome;
 				}
 			} else if (jsonObj && jsonObj.payload) {
 				if (jsonObj.payload.hasOwnProperty('dailyScoreTarget')) {
-					console.log("Got dailyPointGoal value: "+jsonObj.payload.dailyScoreTarget);
 					elements.dailyScoreTarget.value = jsonObj.payload.dailyScoreTarget;
 				}
 				if (jsonObj.payload.hasOwnProperty('interactionIntervalMinutes')) {
-					console.log("Got dailyPointGoal value: "+jsonObj.payload.interactionIntervalMinutes);
 					elements.interactionIntervalMinutes.value = jsonObj.payload.interactionIntervalMinutes;
 				}
 				if (jsonObj.payload.hasOwnProperty('easyOutcome')) {
-					console.log("Got dailyPointGoal value: "+jsonObj.payload.easyOutcome);
 					elements.easyOutcome.value = jsonObj.payload.easyOutcome;
 				}
 				if (jsonObj.payload.hasOwnProperty('mediumOutcome')) {
-					console.log("Got dailyPointGoal value: "+jsonObj.payload.mediumOutcome);
 					elements.mediumOutcome.value = jsonObj.payload.mediumOutcome;
 				}
 				if (jsonObj.payload.hasOwnProperty('hardOutcome')) {
-					console.log("Got dailyPointGoal value: "+jsonObj.payload.hardOutcome);
 					elements.hardOutcome.value = jsonObj.payload.hardOutcome;
 				}
 				

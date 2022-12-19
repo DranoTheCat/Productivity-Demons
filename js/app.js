@@ -18,7 +18,7 @@ function connected (jsn) {
     );
 }
 
-var animationFrames = {
+var r_animationFrames = {
     "happy": {
         "idle": {
             "1": "images/happy1.png",
@@ -340,20 +340,18 @@ var demonAction = {
             easyOutcome: "Relax!",
             mediumOutcome: "Stretch!",
             hardOutcome: "Be Productive!",
-            interactionIntervalMinutes: 5, // 15?
+            interactionIntervalMinutes: 33, // 15?
             dailyScoreTarget: 100,
-        },
-        runtime: {
-            lastInteractionTime: 0,
-            scoreTotal: 0,
-            animationTime: 0,
-            animationFrame: 1,
-            animationSet: "happy",
-            animationAction: "idle",
-            lastBreath: 0,
-            lastOtherAnim: 0,
-            frameNum: 0,
-            lastFrame: 0,
+            r_lastInteractionTime: 0,
+            r_scoreTotal: 0,
+            r_animationTime: 0,
+            r_animationFrame: 1,
+            r_animationSet: "happy",
+            r_animationAction: "idle",
+            r_lastBreath: 0,
+            r_lastOtherAnim: 0,
+            r_frameNum: 0,
+            r_lastFrame: 0,
         },
     },
 
@@ -369,8 +367,8 @@ var demonAction = {
     onKeyDown: function(jsonObj) {
         var context = jsonObj.context;
         lastContext = context;
-        demonAction.updateRuntime(context, {
-            lastInteractionTime: Date.now(),
+        demonAction.updateSafeSettings(context, {
+            r_lastInteractionTime: Date.now(),
         });
     },
 
@@ -378,32 +376,32 @@ var demonAction = {
         var context = jsonObj.context;
         lastContext = context;
         let handleObj = this.getHandleObjFromCache(context);
-        let scoreTotal = handleObj.runtime.scoreTotal;
-        let animationSet = handleObj.runtime.animationSet;
-        let lastInteractionTime = handleObj.runtime.lastInteractionTime;
+        let r_scoreTotal = handleObj.settings.r_scoreTotal;
+        let r_animationSet = handleObj.settings.r_animationSet;
+        let r_lastInteractionTime = handleObj.settings.r_lastInteractionTime;
 
-        if (Date.now() - lastInteractionTime > 500) { // long press -- reset
-            scoreTotal = 0;
-            animationSet = "happy";
-            demonAction.updateRuntime(context, {
-                animationSet: animationSet,
-                scoreTotal: scoreTotal,
+        if (Date.now() - r_lastInteractionTime > 500) { // long press -- reset
+            r_scoreTotal = 0;
+            r_animationSet = "happy";
+            demonAction.updateSafeSettings(context, {
+                r_animationSet: r_animationSet,
+                r_scoreTotal: r_scoreTotal,
             });
         }
 
         // do slot machine stuff here    
-        scoreTotal += 5;
+        r_scoreTotal += 5;
 
         let now = Date.now();
         let as = "happy";
-        if (animationSet == 'blissful') {
+        if (r_animationSet == 'blissful') {
             as = 'blissful';
         }
-        demonAction.updateRuntime(context, {
-            lastInteractionTime: now,
-            animationSet: as,
-            animationAction: "blink",
-            scoreTotal: scoreTotal,
+        demonAction.updateSafeSettings(context, {
+            r_lastInteractionTime: now,
+            r_animationSet: as,
+            r_animationAction: "blink",
+            r_scoreTotal: r_scoreTotal,
         });
         this.updateDisplay(context);
     },
@@ -411,72 +409,72 @@ var demonAction = {
     onWillAppear: function(jsonObj) {
         var context = jsonObj.context;
         var settings = jsonObj.payload.settings;
-        var runtime = jsonObj.payload.runtime;
+        console.log(jsonObj);
+        console.log("settings: ");
+        console.log(settings);
         lastContext = context;
         let handleObj = this.getHandleObjFromCache(context);
-        if (runtime != null) {
-            if (runtime.hasOwnProperty('lastInteractionTime')) {
-                handleObj.runtime.lastInteractionTime = runtime['lastInteractionTime'];
-                if (unaldeObj.runtime.lastInteractionTime === undefined || isNaN(handleObj.runtime.lastInteractionTime)) {
-                    handleObj.runtime.lastInteractionTime = 0;
-                }
-            }
-            if (runtime.hasOwnProperty('scoreTotal')) {
-                handleObj.runtime.scoreTotal = runtime['scoreTotal'];
-                if (unaldeObj.runtime.scoreTotal === undefined || isNaN(handleObj.runtime.scoreTotal)) {
-                    handleObj.runtime.scoreTotal = 0;
-                }
-            }
-            if (runtime.hasOwnProperty('animationTime')) {
-                handleObj.runtime.animationTime = runtime['animationTime'];
-                if (unaldeObj.runtime.animationTime === undefined || isNaN(handleObj.runtime.animationTime)) {
-                    handleObj.runtime.animationTime = 0;
-                }
-            }
-            if (runtime.hasOwnProperty('animationFrame')) {
-                handleObj.runtime.animationFrame = runtime['animationFrame'];
-                if (unaldeObj.runtime.animationFrame === undefined || isNaN(handleObj.runtime.animationFrame)) {
-                    handleObj.runtime.animationFrame = 1;
-                }
-            }
-            if (runtime.hasOwnProperty('animationSet')) {
-                handleObj.runtime.animationSet = runtime['animationSet'];
-                if (unaldeObj.runtime.animationSet === undefined) {
-                    handleObj.runtime.animationSet = "happy";
-                }
-            }
-            if (runtime.hasOwnProperty('animationAction')) {
-                handleObj.runtime.animationAction = runtime['animationAction'];
-                if (unaldeObj.runtime.animationAction === undefined) {
-                    handleObj.runtime.animationAction = "idle";
-                }
-            }
-            if (runtime.hasOwnProperty('lastBreath')) {
-                handleObj.runtime.lastBreath = runtime['lastBreath'];
-                if (unaldeObj.runtime.lastBreath === undefined) {
-                    handleObj.runtime.lastBreath = 0;
-                }
-            }
-            if (runtime.hasOwnProperty('lastOtherAnim')) {
-                handleObj.runtime.lastOtherAnim = runtime['lastOtherAnim'];
-                if (unaldeObj.runtime.lastOtherAnim === undefined) {
-                    handleObj.runtime.lastOtherAnim = 0;
-                }
-            }
-            if (runtime.hasOwnProperty('frameNum')) {
-                handleObj.runtime.frameNum = runtime['frameNum'];
-                if (unaldeObj.runtime.frameNum === undefined) {
-                    handleObj.runtime.frameNum = 0;
-                }
-            }
-            if (runtime.hasOwnProperty('lastFrame')) {
-                handleObj.runtime.fralastFrameeNum = runtime['lastFrame'];
-                if (unaldeObj.runtime.lastFrame === undefined) {
-                    handleObj.runtime.lastFrame = 0;
-                }
-            }
-        }
         if (settings != null) {
+            if (settings.hasOwnProperty('r_lastInteractionTime')) {
+                handleObj.settings.r_lastInteractionTime = settings['r_lastInteractionTime'];
+                if (handleObj.settings.r_lastInteractionTime === undefined || isNaN(handleObj.settings.r_lastInteractionTime)) {
+                    handleObj.settings.r_lastInteractionTime = 0;
+                }
+            }
+            if (settings.hasOwnProperty('r_scoreTotal')) {
+                handleObj.settings.r_scoreTotal = settings['r_scoreTotal'];
+                if (handleObj.settings.r_scoreTotal === undefined || isNaN(handleObj.settings.r_scoreTotal)) {
+                    handleObj.settings.r_scoreTotal = 0;
+                }
+            }
+            if (settings.hasOwnProperty('r_animationTime')) {
+                handleObj.settings.r_animationTime = settings['r_animationTime'];
+                if (handleObj.settings.r_animationTime === undefined || isNaN(handleObj.settings.r_animationTime)) {
+                    handleObj.settings.r_animationTime = 0;
+                }
+            }
+            if (settings.hasOwnProperty('r_animationFrame')) {
+                handleObj.settings.r_animationFrame = settings['r_animationFrame'];
+                if (handleObj.settings.r_animationFrame === undefined || isNaN(handleObj.settings.r_animationFrame)) {
+                    handleObj.settings.r_animationFrame = 1;
+                }
+            }
+            if (settings.hasOwnProperty('r_animationSet')) {
+                handleObj.settings.r_animationSet = settings['r_animationSet'];
+                if (handleObj.settings.r_animationSet === undefined) {
+                    handleObj.settings.r_animationSet = "happy";
+                }
+            }
+            if (settings.hasOwnProperty('r_animationAction')) {
+                handleObj.settings.r_animationAction = settings['r_animationAction'];
+                if (handleObj.settings.r_animationAction === undefined) {
+                    handleObj.settings.r_animationAction = "idle";
+                }
+            }
+            if (settings.hasOwnProperty('r_lastBreath')) {
+                handleObj.settings.r_lastBreath = settings['r_lastBreath'];
+                if (handleObj.settings.r_lastBreath === undefined) {
+                    handleObj.settings.r_lastBreath = 0;
+                }
+            }
+            if (settings.hasOwnProperty('r_lastOtherAnim')) {
+                handleObj.settings.r_lastOtherAnim = settings['r_lastOtherAnim'];
+                if (handleObj.settings.r_lastOtherAnim === undefined) {
+                    handleObj.settings.r_lastOtherAnim = 0;
+                }
+            }
+            if (settings.hasOwnProperty('r_frameNum')) {
+                handleObj.settings.r_frameNum = settings['r_frameNum'];
+                if (handleObj.settings.r_frameNum === undefined) {
+                    handleObj.settings.r_frameNum = 0;
+                }
+            }
+            if (settings.hasOwnProperty('r_lastFrame')) {
+                handleObj.settings.r_lastFrameNum = settings['r_lastFrame'];
+                if (handleObj.settings.r_lastFrame === undefined) {
+                    handleObj.settings.r_lastFrame = 0;
+                }
+            }
             if (settings.hasOwnProperty('easyOutcome')) {
                 handleObj.settings.easyOutcome = settings['easyOutcome'] || "Rleax!";
             }
@@ -486,7 +484,15 @@ var demonAction = {
             if (settings.hasOwnProperty('hardOutcome')) {
                 handleObj.settings.hardOutcome = settings['hardOutcome'] || "Be Productive!";
             }
+            if (settings.hasOwnProperty('interactionIntervalMinutes')) {
+                handleObj.settings.interactionIntervalMinutes = settings['interactionIntervalMinutes'] || 5; // Swich 5 for some kind of var ffs
+            }
+            if (settings.hasOwnProperty('dailyScoreTarget')) {
+                handleObj.settings.dailyScoreTarget = settings['dailyScoreTarget'] || 100;
+            }
         }
+
+        console.log("onWillAppear interactionIntervalMinutes at " + handleObj.settings.interactionIntervalMinutes);
         handleObj.timer = setInterval(function () {
             demonAction.updateDisplay(context);
         }, 32);
@@ -498,6 +504,8 @@ var demonAction = {
         var context = jsonObj.context;
         let handleObj = this.getHandleObjFromCache(context);
         if (jsonObj.payload.hasOwnProperty('DATAREQUEST')) {
+            console.log(jsonObj);
+            console.log("updating PI");
             $SD.api.sendToPropertyInspector(
                 jsonObj.context,
                 {
@@ -511,25 +519,27 @@ var demonAction = {
             );
         } else {
             if (jsonObj.payload.hasOwnProperty('easyOutcome')) {
-                const val = jsonObj.payload['easyOutcome'] || "Relax!";
+                const val = jsonObj.payload['easyOutcome'];
                 handleObj.settings.easyOutcome = val;
             }
             if (jsonObj.payload.hasOwnProperty('mediumOutcome')) {
-                const val = jsonObj.payload['mediumOutcome'] || "Stretch!";
+                const val = jsonObj.payload['mediumOutcome'];
                 handleObj.settings.mediumOutcome = val;
             }
             if (jsonObj.payload.hasOwnProperty('hardOutcome')) {
-                const val = jsonObj.payload['hardOutcome'] || "Be Productive!";
+                const val = jsonObj.payload['hardOutcome'];
                 handleObj.settings.hardOutcome = val;
             }
             if (jsonObj.payload.hasOwnProperty('interactionIntervalMinutes')) {
                 const val = parseInt(jsonObj.payload['interactionIntervalMinutes']) || 5;
+                console.log("onSendToPlugin resetting interactionIntervalMinutes to " + val);
                 handleObj.settings.interactionIntervalMinutes = val;
             }
             if (jsonObj.payload.hasOwnProperty('dailyScoreTarget')) {
-                const val = parseInt(jsonObj.payload['dailyScoreTarget']) || 5;
+                const val = parseInt(jsonObj.payload['dailyScoreTarget']) || 100;
                 handleObj.settings.dailyScoreTarget = val;
             }
+            console.log("onSendToPlugin resetting interactionIntervalMinutes to " + handleObj.settings.interactionIntervalMinutes);
             demonAction.updateSettings(context, {
                 easyOutcome: handleObj.settings.easyOutcome,
                 mediumOutcome: handleObj.settings.mediumOutcome,
@@ -543,105 +553,104 @@ var demonAction = {
     updateDisplay: function(context) {
         let handleObj = this.getHandleObjFromCache(context);
         
-        let animationTime = handleObj.runtime.animationTime;
-        let animationFrame = handleObj.runtime.animationFrame;
-        let animationSet = handleObj.runtime.animationSet;
-        let animationAction = handleObj.runtime.animationAction;
-        let lastBreath = handleObj.runtime.lastBreath;
-        let lastOtherAnim = handleObj.runtime.lastOtherAnim;
-        let lastInteractionTime = handleObj.runtime.lastInteractionTime;
-        let scoreTotal = handleObj.runtime.scoreTotal;
-        let frameNum = handleObj.runtime.frameNum;
-        let lastFrame = handleObj.runtime.lastFrame;
+        let r_animationTime = handleObj.settings.r_animationTime;
+        let r_animationFrame = handleObj.settings.r_animationFrame;
+        let r_animationSet = handleObj.settings.r_animationSet;
+        let r_animationAction = handleObj.settings.r_animationAction;
+        let r_lastBreath = handleObj.settings.r_lastBreath;
+        let r_lastOtherAnim = handleObj.settings.r_lastOtherAnim;
+        let r_lastInteractionTime = handleObj.settings.r_lastInteractionTime;
+        let r_scoreTotal = handleObj.settings.r_scoreTotal;
+        let r_frameNum = handleObj.settings.r_frameNum;
+        let r_lastFrame = handleObj.settings.r_lastFrame;
         let now = Date.now();
 
         // Track 24 frame-rate for background stuffs (pentagram, etc.)
-        if (now - lastFrame > 41.67) {
-            frameNum += 1;
-            if (frameNum >= 24) {
-                frameNum = 1;
+        if (now - r_lastFrame > 41.67) {
+            r_frameNum += 1;
+            if (r_frameNum >= 24) {
+                r_frameNum = 1;
             }
-            lastFrame = now;
-            demonAction.updateRuntime(context, {
-                frameNum: frameNum,
-                lastFrame: lastFrame,
+            r_lastFrame = now;
+            demonAction.updateSafeSettings(context, {
+                r_frameNum: r_frameNum,
+                r_lastFrame: r_lastFrame,
             });
         }
 
-        if (animationAction == 'idle') {
-            animationFrame = 1;
-            if (animationSet != 'blissful') {
-                if (scoreTotal >= handleObj.settings.dailyScoreTarget) {
-                    animationSet = "blissful";
-                    demonAction.updateRuntime(context, {
-                        animationSet: animationSet,
+        if (r_animationAction == 'idle') {
+            r_animationFrame = 1;
+            if (r_animationSet != 'blissful') {
+                if (r_scoreTotal >= handleObj.settings.dailyScoreTarget) {
+                    r_animationSet = "blissful";
+                    demonAction.updateSafeSettings(context, {
+                        r_animationSet: r_animationSet,
                     });
                 }
             }
         } else {
-            if (animationFrame >= Object.keys(animationTimings[""+animationSet][""+animationAction]).length) {
-                animationFrame = 1;
-                animationAction = 'idle';
-                demonAction.updateRuntime(context, {
-                    animationFrame: animationFrame,
-                    animationAction: animationAction,
+            if (r_animationFrame >= Object.keys(animationTimings[""+r_animationSet][""+r_animationAction]).length) {
+                r_animationFrame = 1;
+                r_animationAction = 'idle';
+                demonAction.updateSafeSettings(context, {
+                    r_animationFrame: r_animationFrame,
+                    r_animationAction: r_animationAction,
                 });
             }
         }
 
         // Are we currently idle? If so, other animations are possible.
-        if (animationAction == 'idle') {
+        if (r_animationAction == 'idle') {
             // Has our last breath been over 4 seconds ago?
-            if (now - lastBreath > breathCycles[""+animationSet]) {
-                lastBreath = now;
-                animationAction = "breath";
-                animationFrame = 1;
-                demonAction.updateRuntime(context, {
-                    animationFrame: animationFrame,
-                    animationAction: animationAction,
-                    lastBreath: lastBreath,
+            if (now - r_lastBreath > breathCycles[""+r_animationSet]) {
+                r_lastBreath = now;
+                r_animationAction = "breath";
+                r_animationFrame = 1;
+                demonAction.updateSafeSettings(context, {
+                    r_animationFrame: r_animationFrame,
+                    r_animationAction: r_animationAction,
+                    r_lastBreath: r_lastBreath,
                 });
             } else {
-                if (now - lastOtherAnim > 1000) { // Check to run other animations every second
+                if (now - r_lastOtherAnim > 1000) { // Check to run other animations every second
                     // Also a good time to see if we need to change state
-                    if (animationSet != 'blissful') {
-                        deltaInterval = parseInt((now - lastInteractionTime) / (handleObj.settings.interactionIntervalMinutes * 500)); // TODO: * 60 // 500 because /2
+                    if (r_animationSet != 'blissful') {
+                        deltaInterval = parseInt((now - r_lastInteractionTime) / (handleObj.settings.interactionIntervalMinutes * 500)); // TODO: * 60 // 500 because /2
                         if (deltaInterval >= stateIntervals.length) {
                             deltaInterval = stateIntervals.length - 1;
                         }
                         nstate = stateIntervals[deltaInterval];
-                        if (nstate != animationSet) {
-                            animationSet = nstate;
-                            console.log("new state: " + nstate);
-                            demonAction.updateRuntime(context, {
-                                animationSet: animationSet,
+                        if (nstate != r_animationSet) {
+                            r_animationSet = nstate;
+                            demonAction.updateSafeSettings(context, {
+                                r_animationSet: r_animationSet,
                             });
                         }
                     }
-                    for (let j in animationOthers[animationSet]) {
-                        if (Math.random() < animationOthers[animationSet][j]) {
-                            animationFrame = 1;
-                            animationAction = j;
-                            demonAction.updateRuntime(context, {
-                                animationFrame: animationFrame,
-                                animationAction: animationAction,
-                                lastOtherAnim: now,
+                    for (let j in animationOthers[r_animationSet]) {
+                        if (Math.random() < animationOthers[r_animationSet][j]) {
+                            r_animationFrame = 1;
+                            r_animationAction = j;
+                            demonAction.updateSafeSettings(context, {
+                                r_animationFrame: r_animationFrame,
+                                r_animationAction: r_animationAction,
+                                r_lastOtherAnim: now,
                             });
                             //break;
                         }
                     }
-                    demonAction.updateRuntime(context, {
-                        lastOtherAnim: now,
+                    demonAction.updateSafeSettings(context, {
+                        r_lastOtherAnim: now,
                     });
                 }
             }
         } else {
-            if (now - animationTime > animationTimings[""+animationSet][""+animationAction][animationFrame]) {
-                animationFrame += 1;
-                animationTime = now;
-                demonAction.updateRuntime(context, {
-                    animationFrame: animationFrame,
-                    animationTime: animationTime,
+            if (now - r_animationTime > animationTimings[""+r_animationSet][""+r_animationAction][r_animationFrame]) {
+                r_animationFrame += 1;
+                r_animationTime = now;
+                demonAction.updateSafeSettings(context, {
+                    r_animationFrame: r_animationFrame,
+                    r_animationTime: r_animationTime,
                 });
             }
         }
@@ -659,34 +668,33 @@ var demonAction = {
         ctx.fillRect(0, 0, handleObj.canvas.width, handleObj.canvas.height);
         
         // Draw the background frame if we have one
-        if (animationSet == 'hellpossessed') {
+        if (r_animationSet == 'hellpossessed') {
             let bgImg = new Image();
-            let bgImgURL = bgAnimations["hellpossessed"][frameNum];
-            console.log(bgImgURL);
+            let bgImgURL = bgAnimations["hellpossessed"][r_frameNum];
             bgImg.onload = () => {
                 // Set the background gradient
                 let gradient = ctx.createLinearGradient(72, 0, 72, 144);
                 gradient.addColorStop(0, "black");
-                gradient.addColorStop(0.5, gradientBackgrounds[""+animationSet][0]);
-                gradient.addColorStop(1, gradientBackgrounds[""+animationSet][1]);
+                gradient.addColorStop(0.5, gradientBackgrounds[""+r_animationSet][0]);
+                gradient.addColorStop(1, gradientBackgrounds[""+r_animationSet][1]);
                 ctx.fillStyle = gradient;
                 ctx.fillRect(0, 0, 144, 144);
                 ctx.fillStyle = "#0A1423";
                 // draw the pentagram
-                ctx.drawImage(bgImg, 0, -144 + (12 * frameNum));
+                ctx.drawImage(bgImg, 0, -144 + (12 * r_frameNum));
             };
             bgImg.src = bgImgURL;
         } else {
             // Set the background gradient
             let gradient = ctx.createLinearGradient(72, 0, 72, 144);
             gradient.addColorStop(0, "black");
-            gradient.addColorStop(0.5, gradientBackgrounds[""+animationSet][0]);
-            gradient.addColorStop(1, gradientBackgrounds[""+animationSet][1]);
+            gradient.addColorStop(0.5, gradientBackgrounds[""+r_animationSet][0]);
+            gradient.addColorStop(1, gradientBackgrounds[""+r_animationSet][1]);
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, 144, 144);
         }
 
-        let resImageURL = animationFrames[""+animationSet][""+animationAction][animationFrame]
+        let resImageURL = r_animationFrames[""+r_animationSet][""+r_animationAction][r_animationFrame]
         let img = new Image();
         img.onload = () => {
             var handleObj = this.getHandleObjFromCache(context);
@@ -702,7 +710,7 @@ var demonAction = {
                 width: 2,
                 height: 120,
             };
-            let time_delta = now - lastInteractionTime;
+            let time_delta = now - r_lastInteractionTime;
             let time_pct = time_delta / (handleObj.settings.interactionIntervalMinutes * 1000); // * TODO: *60 more
             time_pct = time_pct - Math.floor(time_pct); // Keep resetting the bar
             if (time_pct > 1) {
@@ -720,7 +728,7 @@ var demonAction = {
                     pixels_to_fill = 1;
                 }
             }
-            if (animationSet == 'blissful') {
+            if (r_animationSet == 'blissful') {
                 pixels_to_fill = nextEventBar.height;
             }
             ctx.fillRect(nextEventBar.x, nextEventBar.y + (nextEventBar.height - pixels_to_fill), nextEventBar.width, pixels_to_fill);
@@ -732,7 +740,7 @@ var demonAction = {
                 width: 2,
                 height: 120,
             };
-            score_pct = scoreTotal / handleObj.settings.dailyScoreTarget;
+            score_pct = r_scoreTotal / handleObj.settings.dailyScoreTarget;
             if (score_pct > 1) {
                 score_pct = 1;
             }
@@ -749,14 +757,13 @@ var demonAction = {
         img.src = resImageURL;
     },
 
-    // Really just saved in settings, but :whistle:
-    updateRuntime: function(context, runtime) {
+    updateSafeSettings: function(context, settings) {
         let handleObj = this.getHandleObjFromCache(context);
-        let updatedRuntime = handleObj.runtime;
-        for(let field in runtime){
-            updatedRuntime[field] = runtime[field];
+        let updatedSettings = handleObj.settings;
+        for(let field in settings){
+            updatedSettings[field] = settings[field];
         }
-        $SD.api.setSettings(context, updatedRuntime);
+        //$SD.api.setSettings(context, updatedSettings);
     },
 
     updateSettings: function(context, settings) {
