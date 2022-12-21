@@ -683,6 +683,7 @@ var demonAction = {
                 ctx.drawImage(bgImg, 0, -144 + (12 * r_frameNum));
             };
             bgImg.src = bgImgURL;
+            //bgImg = undef; // Memory leak?
         } else {
             // Set the background gradient
             let gradient = ctx.createLinearGradient(72, 0, 72, 144);
@@ -754,6 +755,7 @@ var demonAction = {
             $SD.api.setImage(context, handleObj.canvas.toDataURL());
         };
         img.src = resImageURL;
+        //img = undef; // Memory leak?
     },
 
     updateSafeSettings: function(context, settings) {
