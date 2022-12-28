@@ -2,7 +2,7 @@
 <html>
 
 <head>
-	<title>com.dranothecat.productivitydemon PI</title>
+	<title>com.dranothecat.productivitydemons PI</title>
 	<meta charset="utf-8" />
 	<link rel="stylesheet" href="css/sdpi.css">
 </head>
@@ -18,7 +18,7 @@
 					<span class="tooltiptext">How many points you are aiming for each day</span>
 				</div>
 			</div>
-			<input inputmode="numeric" pattern="[0-9]*" type="number" class="sdpi-item-value" id="dailyScoreTarget" onchange="sendValueToPlugin(event.target.value, 'dailyScoreTarget')" placeholder="100">
+			<input inputmode="numeric" pattern="[0-9]*" type="number" class="sdpi-item-value" id="dailyScoreTarget" onchange="sendValueToPlugin(event.target.value, 'dailyScoreTarget')" placeholder="50">
 		</div>
 		<div class="sdpi-item">
 			<div class="tooltip">
@@ -61,6 +61,33 @@
 			<input inputmode="text" pattern="[0-9a-zA-Z ]*" type="text" class="sdpi-item-value" id="hardOutcome" onchange="sendValueToPlugin(event.target.value, 'hardOutcome')" placeholder="Be Productive!">
 		</div>
 		<hr/>
+		<div>
+			<p><i>Advanced Settings</i></p>
+		</div>
+		<div class="sdpi-item">
+			<div class="tooltip">
+				<div class="sdpi-item-label">Lockout Interval
+					<span class="tooltiptext">Duration in seconds that interaction be locked out after a spin  (Default is 90 seconds)</i></span>
+				</div>
+			</div>
+			<input inputmode="text" pattern="[0-9]*" type="number" class="sdpi-item-value" id="lockoutInterval" onchange="sendValueToPlugin(event.target.value, 'lockoutInterval')" placeholder="90">
+		</div>
+		<div class="sdpi-item">
+			<div class="tooltip">
+				<div class="sdpi-item-label">Result Animation Duration
+					<span class="tooltiptext">Duration in seconds the result animation is played after a spin  (Default is 60 seconds)</i></span>
+				</div>
+			</div>
+			<input inputmode="text" pattern="[0-9]*" type="number" class="sdpi-item-value" id="resultAnimationDuration" onchange="sendValueToPlugin(event.target.value, 'resultAnimationDuration')" placeholder="60">
+		</div>
+		<div class="sdpi-item">
+			<div class="tooltip">
+				<div class="sdpi-item-label">Result Text Duration
+					<span class="tooltiptext">Duration in seconds the scrolling result text is played after a spin  (Default is 15 seconds)</i></span>
+				</div>
+			</div>
+			<input inputmode="text" pattern="[0-9]*" type="number" class="sdpi-item-value" id="resultTextDuration" onchange="sendValueToPlugin(event.target.value, 'resultTextDuration')" placeholder="15">
+		</div>
 		<div class="center">
 			<p>©DranoTheCat 2022</p>
 		</ddiv>
@@ -88,6 +115,9 @@
 			easyOutcome: null,
 			mediumOutcome: null,
 			hardOutcome: null,
+			lockoutInterval: null,
+			resultAnimationDuration: null,
+			resultTextDuration: null,
 			resetHour: null,
 		}
 
@@ -106,6 +136,15 @@
 				if (jsonObj.payload.settings.hasOwnProperty('resetHour')) {
 					elements.resetHour.value = jsonObj.payload.settings.resetHour;
 				}
+				if (jsonObj.payload.settings.hasOwnProperty('lockoutInterval')) {
+					elements.lockoutInterval.value = jsonObj.payload.settings.lockoutInterval;
+				}
+				if (jsonObj.payload.settings.hasOwnProperty('resultAnimationDuration')) {
+					elements.resultAnimationDuration.value = jsonObj.payload.settings.resultAnimationDuration;
+				}
+				if (jsonObj.payload.settings.hasOwnProperty('resultTextDuration')) {
+					elements.resultTextDuration.value = jsonObj.payload.settings.resultTextDuration;
+				}
 				if (jsonObj.payload.settings.hasOwnProperty('easyOutcome')) {
 					elements.easyOutcome.value = jsonObj.payload.settings.easyOutcome;
 				}
@@ -121,6 +160,15 @@
 				}
 				if (jsonObj.payload.hasOwnProperty('resetHour')) {
 					elements.resetHour.value = jsonObj.payload.resetHour;
+				}
+				if (jsonObj.payload.hasOwnProperty('lockoutInterval')) {
+					elements.lockoutInterval.value = jsonObj.payload.lockoutInterval;
+				}
+				if (jsonObj.payload.hasOwnProperty('resultAnimationDuration')) {
+					elements.resultAnimationDuration.value = jsonObj.payload.resultAnimationDuration;
+				}
+				if (jsonObj.payload.hasOwnProperty('resultTextDuration')) {
+					elements.resultTextDuration.value = jsonObj.payload.resultTextDuration;
 				}
 				if (jsonObj.payload.hasOwnProperty('interactionIntervalMinutes')) {
 					elements.interactionIntervalMinutes.value = jsonObj.payload.interactionIntervalMinutes;
@@ -147,6 +195,9 @@
 			elements.dailyScoreTarget = document.querySelector("#dailyScoreTarget");
 			elements.interactionIntervalMinutes = document.querySelector("#interactionIntervalMinutes");
 			elements.resetHour = document.querySelector("#resetHour");
+			elements.lockoutInterval = document.querySelector("#lockoutInterval");
+			elements.resultAnimationDuration = document.querySelector("#resultAnimationDuration");
+			elements.resultTextDuration = document.querySelector("#resultTextDuration");
 			elements.easyOutcome = document.querySelector("#easyOutcome");
 			elements.mediumOutcome = document.querySelector("#mediumOutcome");
 			elements.hardOutcome = document.querySelector("#hardOutcome");

@@ -2,16 +2,16 @@ $SD.on('connected', conn => connected(conn));
 
 function connected (jsn) {
     console.log('Productivity Demon plugin connected: ' + jsn);
-    $SD.on('com.dranothecat.productivitydemon.action.willAppear', jsonObj =>
+    $SD.on('com.dranothecat.productivitydemons.action.willAppear', jsonObj =>
         demonAction.onWillAppear(jsonObj)
     );
-    $SD.on('com.dranothecat.productivitydemon.action.keyDown', jsonObj =>
+    $SD.on('com.dranothecat.productivitydemons.action.keyDown', jsonObj =>
         demonAction.onKeyDown(jsonObj)
     );
-    $SD.on('com.dranothecat.productivitydemon.action.keyUp', jsonObj =>
+    $SD.on('com.dranothecat.productivitydemons.action.keyUp', jsonObj =>
         demonAction.onKeyUp(jsonObj)
     );
-    $SD.on('com.dranothecat.productivitydemon.action.sendToPlugin', jsonObj =>
+    $SD.on('com.dranothecat.productivitydemons.action.sendToPlugin', jsonObj =>
         demonAction.onSendToPlugin(jsonObj)
     );
 }
@@ -28,10 +28,18 @@ var lastBreath = 0;
 var lastOtherAnim = 0;
 var frameNum = 0;
 var lastFrame = 0;
-var lastReset = 0;
+var spinStart = 0;
+var exitEarly = false;
+var resultAnimationStart = 0;
+var showTimeoutClock = false;
+var showTimeoutStart = 0;
+var timeoutFlipper = 0;
+var mNum = 0;
+var mText = "";
+var mText2 = "";
 
 var demonAction = {
-    type: "com.dranothecat.productivitydemon.action",
+    type: "com.dranothecat.productivitydemons.action",
     cache: {},
     lastContext: null,
     defaultHandleObj: {
@@ -42,10 +50,14 @@ var demonAction = {
             mediumOutcome: "Stretch!",
             hardOutcome: "Be Productive!",
             interactionIntervalMinutes: 15,
-            dailyScoreTarget: 100,
+            dailyScoreTarget: 50,
             resetHour: 0,
+            lockoutInterval: 90,
+            resultAnimationDuration: 60,
+            resultTextDuration: 15,
             r_lastInteractionTime: 0,
             r_scoreTotal: 0,
+            r_lastReset: 0,
         },
     },
 
@@ -75,44 +87,48 @@ var demonAction = {
         let r_lastInteractionTime = handleObj.settings.r_lastInteractionTime;
         let now = Date.now();
 
-        if (keyDownPush == true && now - r_lastInteractionTime > 500) { // long press -- reset
+        // Reset if we were long-pressed
+        if (keyDownPush == true && now - r_lastInteractionTime > 500) {
             keyDownPush = false;
             r_scoreTotal = 0;
             animationSet = "happy";
+            animationAction = "idle";
             r_lastInteractionTime = now;
-            lastReset = now;
+            r_lastReset = 0;
+            resultAnimationStart = 0;
+            spinStart = 0;
+            mNum = 0;
+            mText = "";
+            mText2 = "";
             demonAction.updateSafeSettings(context, {
                 r_scoreTotal: r_scoreTotal,
+                r_lastReset: r_lastReset,
                 r_lastInteractionTime: r_lastInteractionTime,
             });
+            return;
         }
 
         // If we are in slots mode, we want to stop the spin. 
         // Otherwise, enter it.
         if (slotMode) {
-            slotMode = false;
-            // TODO - Choose an outcome
+            exitEarly = true;
         } else {
-            slotMode = true;
-            animationSet = "slots";
-            animationAction = "spin";
-            demonAction.updateSafeSettings(context, {
-                r_lastInteractionTime: now,
-            });
+            if (now - spinStart > handleObj.settings.lockoutInterval * 1000) { // Been at least 90 seconds since our last spin (TODO: Settings?)
+                exitEarly = false;
+                spinStart = now;
+                slotMode = true;
+                animationSet = "slots";
+                animationAction = "spin";
+                mNum = 0;
+                demonAction.updateSafeSettings(context, {
+                    r_lastInteractionTime: now,
+                });
+            } else {
+                showTimeoutClock = true;
+                showTimeoutStart = now;
+            }
         }
 
-        /*r_scoreTotal += 5;
-
-        let as = "happy";
-        if (r_animationSet == 'blissful') {
-            as = 'blissful';
-        }
-        demonAction.updateSafeSettings(context, {
-            r_lastInteractionTime: now,
-            r_animationSet: as,
-            r_animationAction: "blink",
-            r_scoreTotal: r_scoreTotal,
-        }); */
         this.updateDisplay(context);
     },
 
@@ -137,6 +153,12 @@ var demonAction = {
                     handleObj.settings.r_scoreTotal = 0;
                 }
             }
+            if (settings.hasOwnProperty('r_lastReset')) {
+                handleObj.settings.r_lastReset = settings['r_lastReset'];
+                if (handleObj.settings.r_lastReset === undefined || isNaN(handleObj.settings.r_lastReset)) {
+                    handleObj.settings.r_lastReset = 0;
+                }
+            }
             if (settings.hasOwnProperty('easyOutcome')) {
                 handleObj.settings.easyOutcome = settings['easyOutcome'] || "Rleax!";
             }
@@ -150,14 +172,22 @@ var demonAction = {
                 handleObj.settings.interactionIntervalMinutes = settings['interactionIntervalMinutes'] || 5; // Swich 5 for some kind of var ffs
             }
             if (settings.hasOwnProperty('dailyScoreTarget')) {
-                handleObj.settings.dailyScoreTarget = settings['dailyScoreTarget'] || 100;
+                handleObj.settings.dailyScoreTarget = settings['dailyScoreTarget'] || 50;
             }
             if (settings.hasOwnProperty('resetHour')) {
                 handleObj.settings.resetHour = settings['resetHour'] || 0;
             }
+            if (settings.hasOwnProperty('lockoutInterval')) {
+                handleObj.settings.lockoutInterval = settings['lockoutInterval'] || 0;
+            }
+            if (settings.hasOwnProperty('resultAnimationDuration')) {
+                handleObj.settings.resultAnimationDuration = settings['resultAnimationDuration'] || 0;
+            }
+            if (settings.hasOwnProperty('resultTextDuration')) {
+                handleObj.settings.resultTextDuration = settings['resultTextDuration'] || 0;
+            }
         }
 
-        console.log("onWillAppear interactionIntervalMinutes at " + handleObj.settings.interactionIntervalMinutes);
         handleObj.timer = setInterval(function () {
             demonAction.updateDisplay(context);
         }, 32);
@@ -179,6 +209,9 @@ var demonAction = {
                     interactionIntervalMinutes: handleObj.settings.interactionIntervalMinutes,
                     dailyScoreTarget: handleObj.settings.dailyScoreTarget,
                     resetHour: handleObj.settings.resetHour,
+                    lockoutInterval: handleObj.settings.lockoutInterval,
+                    resultAnimationDuration: handleObj.settings.resultAnimationDuration,
+                    resultTextDuration: handleObj.settings.resultTextDuration,
                 },
                 this.type
             );
@@ -201,12 +234,24 @@ var demonAction = {
                 handleObj.settings.interactionIntervalMinutes = val;
             }
             if (jsonObj.payload.hasOwnProperty('dailyScoreTarget')) {
-                const val = parseInt(jsonObj.payload['dailyScoreTarget']) || 100;
+                const val = parseInt(jsonObj.payload['dailyScoreTarget']) || 50;
                 handleObj.settings.dailyScoreTarget = val;
             }
             if (jsonObj.payload.hasOwnProperty('resetHour')) {
                 const val = parseInt(jsonObj.payload['resetHour']) || 0;
                 handleObj.settings.resetHour = val;
+            }
+            if (jsonObj.payload.hasOwnProperty('lockoutInterval')) {
+                const val = parseInt(jsonObj.payload['lockoutInterval']) || 0;
+                handleObj.settings.lockoutInterval = val;
+            }
+            if (jsonObj.payload.hasOwnProperty('resultAnimationDuration')) {
+                const val = parseInt(jsonObj.payload['resultAnimationDuration']) || 0;
+                handleObj.settings.resultAnimationDuration = val;
+            }
+            if (jsonObj.payload.hasOwnProperty('resultTextDuration')) {
+                const val = parseInt(jsonObj.payload['resultTextDuration']) || 0;
+                handleObj.settings.resultTextDuration = val;
             }
             console.log("onSendToPlugin resetting interactionIntervalMinutes to " + handleObj.settings.interactionIntervalMinutes);
             demonAction.updateSettings(context, {
@@ -215,6 +260,9 @@ var demonAction = {
                 hardOutcome: handleObj.settings.hardOutcome,
                 interactionIntervalMinutes: handleObj.settings.interactionIntervalMinutes,
                 dailyScoreTarget: handleObj.settings.dailyScoreTarget,
+                lockoutInterval: handleObj.settings.lockoutInterval,
+                resultAnimationDuration: handleObj.settings.resultAnimationDuration,
+                resultTextDuration: handleObj.settings.resultTextDuration,
                 resetHour: handleObj.settings.resetHour,
             });
         }
@@ -225,23 +273,64 @@ var demonAction = {
         
         let r_lastInteractionTime = handleObj.settings.r_lastInteractionTime;
         let r_scoreTotal = handleObj.settings.r_scoreTotal;
+        let r_lastReset = handleObj.settings.r_lastReset;
         let now = Date.now();
 
-        if (now - lastSave > 30000) {
+        if (now - lastSave > 15000) {
             console.log("Saving runtime.");
             lastSave = now;
             demonAction.saveSafeSettings(context);
         }
 
         // Do we need to reset?
-        let tdelta = now - lastReset;
-        if (tdelta > 7200000) { // 7.2m is 2 hours of ms
+        let tdelta = now - r_lastReset;
+        if (tdelta > 86400000) { 
             let td = new Date();
             if (td.getHours() >= handleObj.settings.resetHour || tdelta > 86400000) { // 1 day in ms
+                console.log("Daily Reset");
                 r_scoreTotal = 0;
                 r_lastInteractionTime = now;
+                r_lastReset = now;
                 demonAction.updateSafeSettings(context, {
                     r_lastInteractionTime: now,
+                    r_scoreTotal: r_scoreTotal,
+                    r_lastReset: now,
+                });
+            }
+        }
+
+        // Slots stuffs
+        if (slotMode) {
+            if (now - spinStart > 4000 || exitEarly) {
+                slotMode = false;
+                exitEarly = false;
+                let outcome = Math.floor((Math.random() * 100)) % 3;
+                console.log("stopping spin with outcome " + outcome);
+                animationFrame = 1;
+                resultAnimationStart = now;
+                switch(outcome) {
+                    case 0: // Easy
+                        animationSet = "slots";
+                        animationAction = "easy_in";
+                        r_scoreTotal += 2;
+                        mText2 = "You gained 2 points!  You now have " + r_scoreTotal + " points.";
+                        break;
+                    case 1: // Medium
+                        animationSet = "slots";
+                        animationAction = "medium_in";
+                        r_scoreTotal += 4;
+                        mText2 = "You gained 4 points!  You now have " + r_scoreTotal + " points.";
+                        break;
+                    case 2: // Hard
+                        animationSet = "slots";
+                        animationAction = "hard_in";
+                        r_scoreTotal += 8;
+                        mText2 = "You gained 8 points!  You now have " + r_scoreTotal + " points.";
+                        break;
+
+                }
+                console.log("Score is now:" + r_scoreTotal);
+                demonAction.updateSafeSettings(context, {
                     r_scoreTotal: r_scoreTotal,
                 });
             }
@@ -266,13 +355,40 @@ var demonAction = {
         } else {
             if (animationFrame >= Object.keys(animationTimings[""+animationSet][""+animationAction]).length) {
                 animationFrame = 1;
-                if (animationAction != "spin") { // TODO: Find a way to make suck less
-                    animationAction = 'idle';
+                lastBreath = now;
+                switch (animationAction) {
+                    case "spin":
+                        break;
+                    case "easy":
+                    case "medium":
+                    case "hard":
+                        if (now - resultAnimationStart > handleObj.settings.resultAnimationDuration * 1000) {
+                            animationAction = 'idle';
+                            animationSet = 'happy';
+                        }
+                        if (now - resultAnimationStart > handleObj.settings.resultTextDuration * 1000) {
+                            mText = "";
+                            mText2 = "";
+                        }
+                        break;
+                    case "easy_in":
+                        animationAction = 'easy';
+                        animationSet = 'actions';
+                        mText = handleObj.settings.easyOutcome;
+                        break;
+                    case "medium_in":
+                        animationAction = 'medium';
+                        animationSet = 'actions';
+                        mText = handleObj.settings.mediumOutcome;
+                        break;
+                    case "hard_in":
+                        animationAction = 'hard';
+                        animationSet = 'actions';
+                        mText = handleObj.settings.hardOutcome;
+                        break;
+                    default:
+                        animationAction = 'idle';
                 }
-                demonAction.updateSafeSettings(context, {
-                    animationFrame: animationFrame,
-                    animationAction: animationAction,
-                });
             }
         }
 
@@ -351,7 +467,35 @@ var demonAction = {
             ctx.fillRect(0, 0, 144, 144);
         }
 
+        if (showTimeoutClock) {
+            let gradient = ctx.createLinearGradient(72, 0, 72, 144);
+            if (timeoutFlipper == 0) {
+                gradient.addColorStop(0, "black");
+                gradient.addColorStop(0.5, "black");
+                gradient.addColorStop(1, "#FF0000");
+                timeoutFlipper = 1;
+            } else {
+                timeoutFlipper = 0;
+                gradient.addColorStop(0, "#FF0000");
+                gradient.addColorStop(0.5, "black");
+                gradient.addColorStop(1, "black");
+            }
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 144, 144);
+        }
+
+        console.log(animationSet);
+        console.log(animationAction);
+        console.log(animationFrame);
+        console.log(animationFrames);
         let resImageURL = animationFrames[""+animationSet][""+animationAction][animationFrame]
+
+        if (showTimeoutClock) {
+            if (now - showTimeoutStart > 1200) {
+                showTimeoutClock = false;
+            }
+        }
+
         let img = new Image();
         img.onload = () => {
             var handleObj = this.getHandleObjFromCache(context);
@@ -359,9 +503,27 @@ var demonAction = {
             // Draw the base frame PNG
             ctx.fillStyle = "#0A1423";
             ctx.drawImage(img, 0, 0);
+
+            // Draw text
+            if (mText != "") {
+                ctx.font = "72px arial";
+                ctx.fillStyle = "#FF00FF";
+                ctx.strokeStyle = "#FFFFFF";
+                ctx.fillText(mText, 144 - 3 * mNum, 100);
+                ctx.strokeText(mText, 144 - 3 * mNum, 100);
+                ctx.font = "36px arial";
+                ctx.fillStyle = "#00FFFF";
+                ctx.strokeStyle = "#FFFFFF";
+                ctx.fillText(mText2, 144 - 5 * mNum, 30);
+                ctx.strokeText(mText2, 144 - 5 * mNum, 30);
+                mNum++;
+                if (mNum > 300) {
+                    mNum = 0;
+                }
+            } 
             
             // Draw the Progress Bar until Next Slot Event
-            if (animationAction != "spin") { 
+            if (animationAction != "spin" && animationSet != "slots" && animationSet != "actions") { 
                 nextEventBar = {
                     x: 6,
                     y: 6,

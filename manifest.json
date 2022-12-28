@@ -12,7 +12,7 @@
       ], 
       "SupportedInMultiActions": false,
       "Tooltip": "Productivity Demon", 
-      "UUID": "com.dranothecat.productivitydemon.action"
+      "UUID": "com.dranothecat.productivitydemons.action"
     }
   ], 
   "SDKVersion": 2,
