@@ -52,9 +52,9 @@ var demonAction = {
             interactionIntervalMinutes: 15,
             dailyScoreTarget: 50,
             resetHour: 0,
-            lockoutInterval: 90,
+            lockoutInterval: 60,
             resultAnimationDuration: 60,
-            resultTextDuration: 15,
+            resultTextDuration: 25,
             r_lastInteractionTime: 0,
             r_scoreTotal: 0,
             r_lastReset: 0,
@@ -113,7 +113,7 @@ var demonAction = {
         if (slotMode) {
             exitEarly = true;
         } else {
-            if (now - spinStart > handleObj.settings.lockoutInterval * 1000) { // Been at least 90 seconds since our last spin (TODO: Settings?)
+            if (now - spinStart > handleObj.settings.lockoutInterval * 1000) {
                 exitEarly = false;
                 spinStart = now;
                 slotMode = true;
@@ -178,13 +178,13 @@ var demonAction = {
                 handleObj.settings.resetHour = settings['resetHour'] || 0;
             }
             if (settings.hasOwnProperty('lockoutInterval')) {
-                handleObj.settings.lockoutInterval = settings['lockoutInterval'] || 0;
+                handleObj.settings.lockoutInterval = settings['lockoutInterval'] || 60;
             }
             if (settings.hasOwnProperty('resultAnimationDuration')) {
-                handleObj.settings.resultAnimationDuration = settings['resultAnimationDuration'] || 0;
+                handleObj.settings.resultAnimationDuration = settings['resultAnimationDuration'] || 60;
             }
             if (settings.hasOwnProperty('resultTextDuration')) {
-                handleObj.settings.resultTextDuration = settings['resultTextDuration'] || 0;
+                handleObj.settings.resultTextDuration = settings['resultTextDuration'] || 25;
             }
         }
 
@@ -242,15 +242,15 @@ var demonAction = {
                 handleObj.settings.resetHour = val;
             }
             if (jsonObj.payload.hasOwnProperty('lockoutInterval')) {
-                const val = parseInt(jsonObj.payload['lockoutInterval']) || 0;
+                const val = parseInt(jsonObj.payload['lockoutInterval']) || 60;
                 handleObj.settings.lockoutInterval = val;
             }
             if (jsonObj.payload.hasOwnProperty('resultAnimationDuration')) {
-                const val = parseInt(jsonObj.payload['resultAnimationDuration']) || 0;
+                const val = parseInt(jsonObj.payload['resultAnimationDuration']) || 60;
                 handleObj.settings.resultAnimationDuration = val;
             }
             if (jsonObj.payload.hasOwnProperty('resultTextDuration')) {
-                const val = parseInt(jsonObj.payload['resultTextDuration']) || 0;
+                const val = parseInt(jsonObj.payload['resultTextDuration']) || 25;
                 handleObj.settings.resultTextDuration = val;
             }
             console.log("onSendToPlugin resetting interactionIntervalMinutes to " + handleObj.settings.interactionIntervalMinutes);
