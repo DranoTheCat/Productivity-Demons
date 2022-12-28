@@ -1,17 +1,17 @@
 {
   "Actions": [
     {
-      "Icon": "images/pluginIcon", 
+      "Icon": "images/actionIcon", 
       "Name": "Productivity Demons", 
       "States": [
         {
-          "Image": "images/pluginIcon",
+          "Image": "images/actionIcon",
           "TitleAlignment": "middle", 
           "FontSize": "16"
         }
       ], 
       "SupportedInMultiActions": false,
-      "Tooltip": "Productivity Demon", 
+      "Tooltip": "Productivity Demons", 
       "UUID": "com.dranothecat.productivitydemons.action"
     }
   ], 
@@ -19,11 +19,11 @@
   "Author": "DranoTheCat", 
   "CodePath": "app.html", 
   "PropertyInspectorPath": "propertyinspector.html",
-  "Description": "Productivity motivational dice-rolling game with a cute demon!", 
-  "Name": "Productivity Demon", 
-  "Icon": "images/actionIcon", 
-  "URL": "https://github.com/dranothecat/ProductivityDemon", 
-  "Version": "0.0.1",
+  "Description": "Motivate productivity with random chance and a cute demon!", 
+  "Name": "Productivity Demons", 
+  "Icon": "images/pluginIcon", 
+  "URL": "https://productivitydemons.dranothecat.com", 
+  "Version": "0.1.0",
   "OS": [
     {
         "Platform": "mac", 
