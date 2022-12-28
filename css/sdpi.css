@@ -1641,3 +1641,30 @@ input[type="range"].colortemperature::-webkit-slider-thumb {
 .context-menu_message{
 	cursor: default;
 }
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 200px;
+  background-color: #3D3D3D;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  box-sizing: border-box;
+  
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -60px;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}

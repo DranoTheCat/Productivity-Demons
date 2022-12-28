@@ -9,24 +9,55 @@
 
 <body>
 	<div class="sdpi-wrapper hidden">
+		<div>
+			<p><i>Hover over a label for more details.</i></p>
+		</div>
 		<div class="sdpi-item">
-			<div class="sdpi-item-label">Daily Score Target</div>
+			<div class="tooltip">
+				<div class="sdpi-item-label">Score Target
+					<span class="tooltiptext">How many points you are aiming for each day</span>
+				</div>
+			</div>
 			<input inputmode="numeric" pattern="[0-9]*" type="number" class="sdpi-item-value" id="dailyScoreTarget" onchange="sendValueToPlugin(event.target.value, 'dailyScoreTarget')" placeholder="100">
 		</div>
 		<div class="sdpi-item">
-			<div class="sdpi-item-label">Interaction Interval (in minutes)</div>
+			<div class="tooltip">
+				<div class="sdpi-item-label">Transition Interval
+					<span class="tooltiptext">How many minutes until your demon becomes more frustrated  <i>(Default is 15 minutes)</i></span>
+				</div>
+			</div>
 			<input inputmode="numeric" pattern="[0-9]*" type="number" class="sdpi-item-value" id="interactionIntervalMinutes" onchange="sendValueToPlugin(event.target.value, 'interactionIntervalMinutes')" placeholder="15">
 		</div>
 		<div class="sdpi-item">
-			<div class="sdpi-item-label">Easy Outcome</div>
+			<div class="tooltip">
+				<div class="sdpi-item-label">Reset Hour
+					<span class="tooltiptext">The hour of the day (0 - 24) you want your demon to reset at</i></span>
+				</div>
+			</div>
+			<input inputmode="numeric" pattern="[0-9]*" type="number" class="sdpi-item-value" id="resetHour" onchange="sendValueToPlugin(event.target.value, 'resetHour')" placeholder="0">
+		</div>
+		<div class="sdpi-item">
+			<div class="tooltip">
+				<div class="sdpi-item-label">Easy Outcome
+					<span class="tooltiptext">Text to display for the "Easy" outcome.  <i>("Default is Relax!")</i></span>
+				</div>
+			</div>
 			<input inputmode="text" pattern="[0-9a-zA-Z ]*" type="text" class="sdpi-item-value" id="easyOutcome" onchange="sendValueToPlugin(event.target.value, 'easyOutcome')" placeholder="Relax!">
 		</div>
 		<div class="sdpi-item">
-			<div class="sdpi-item-label">Medium Outcome</div>
+			<div class="tooltip">
+				<div class="sdpi-item-label">Medium Outcome
+					<span class="tooltiptext">Text to display for the "Medium" outcome.  <i>(Default is "Stretch!")</i></span>
+				</div>
+			</div>
 			<input inputmode="text" pattern="[0-9a-zA-Z ]*" type="text" class="sdpi-item-value" id="mediumOutcome" onchange="sendValueToPlugin(event.target.value, 'mediumOutcome')" placeholder="Stretch!">
 		</div>
 		<div class="sdpi-item">
-			<div class="sdpi-item-label">Hard Outcome</div>
+			<div class="tooltip">
+				<div class="sdpi-item-label">Hard Outcome
+					<span class="tooltiptext">Text to display for the "Hard" outcome.  <i>(Default is "Be Productive!")</i></span>
+				</div>
+			</div>
 			<input inputmode="text" pattern="[0-9a-zA-Z ]*" type="text" class="sdpi-item-value" id="hardOutcome" onchange="sendValueToPlugin(event.target.value, 'hardOutcome')" placeholder="Be Productive!">
 		</div>
 		<hr/>
@@ -57,6 +88,7 @@
 			easyOutcome: null,
 			mediumOutcome: null,
 			hardOutcome: null,
+			resetHour: null,
 		}
 
 		$SD.on('connected', (jsonObj) => connected(jsonObj));
@@ -71,6 +103,9 @@
 				if (jsonObj.payload.settings.hasOwnProperty('interactionIntervalMinutes')) {
 					elements.interactionIntervalMinutes.value = jsonObj.payload.settings.interactionIntervalMinutes;
 				}
+				if (jsonObj.payload.settings.hasOwnProperty('resetHour')) {
+					elements.resetHour.value = jsonObj.payload.settings.resetHour;
+				}
 				if (jsonObj.payload.settings.hasOwnProperty('easyOutcome')) {
 					elements.easyOutcome.value = jsonObj.payload.settings.easyOutcome;
 				}
@@ -83,6 +118,9 @@
 			} else if (jsonObj && jsonObj.payload) {
 				if (jsonObj.payload.hasOwnProperty('dailyScoreTarget')) {
 					elements.dailyScoreTarget.value = jsonObj.payload.dailyScoreTarget;
+				}
+				if (jsonObj.payload.hasOwnProperty('resetHour')) {
+					elements.resetHour.value = jsonObj.payload.resetHour;
 				}
 				if (jsonObj.payload.hasOwnProperty('interactionIntervalMinutes')) {
 					elements.interactionIntervalMinutes.value = jsonObj.payload.interactionIntervalMinutes;
@@ -108,6 +146,7 @@
 
 			elements.dailyScoreTarget = document.querySelector("#dailyScoreTarget");
 			elements.interactionIntervalMinutes = document.querySelector("#interactionIntervalMinutes");
+			elements.resetHour = document.querySelector("#resetHour");
 			elements.easyOutcome = document.querySelector("#easyOutcome");
 			elements.mediumOutcome = document.querySelector("#mediumOutcome");
 			elements.hardOutcome = document.querySelector("#hardOutcome");
@@ -119,7 +158,6 @@
 		};
 
 		function sendValueToPlugin(value, param) {
-			console.log("SENDING VALUE TO PLUGIN: ", value, uuid, actionInfo);
 			if ($SD && $SD.connection) {
 				var payload = {};
 				if (param) {
